@@ -41,7 +41,7 @@ const overlayStyles = css`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity (0.5) as needed */
+  background-color: rgba(0, 0, 0, 0.5); 
 `;
 
 const logoStyles = css`

@@ -129,17 +129,11 @@ const AnimeList: React.FC = () => {
     };
 
     const validateCollectionName = (name: string) => {
-        // Implement your own logic to check if the name is unique
-        // You can compare it against a list of existing collection names or perform a backend query
-        // Return true if the name is unique, false otherwise
         const existingCollectionNames = ['Collection 1', 'Collection 2', 'Collection 3'];
         return !existingCollectionNames.includes(name);
     };
 
     const validateSpecialCharacters = (name: string) => {
-        // Implement your own logic to check if the name contains special characters
-        // You can use regex or other string manipulation methods
-        // Return true if the name contains special characters, false otherwise
         const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
         return specialCharacterRegex.test(name);
     };
@@ -321,7 +315,7 @@ const styles = {
 
       img {
         width: 100%;
-        height: 200px; /* Set the desired height for the images */
+        height: 200px; 
         object-fit: cover;
         border-radius: 5px;
         cursor: pointer;
@@ -333,20 +327,20 @@ const styles = {
       font-weight: bold; 
       color: #ffffff;
       text-align: left;
-      height: 30px; /* Add a fixed height */
-      overflow: hidden; /* Hide overflow if the title exceeds the height */
-      text-overflow: ellipsis; /* Add ellipsis if the title exceeds the height */
-      white-space: nowrap; /* Prevent wrapping of the title */
+      height: 30px; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+      white-space: nowrap; 
     }
 
     p {
       margin: 5px 0;
       font-size: 12px;
       text-align: left;
-      height: 20px; /* Add a fixed height */
-      overflow: hidden; /* Hide overflow if the title exceeds the height */
-      text-overflow: ellipsis; /* Add ellipsis if the title exceeds the height */
-      white-space: nowrap; /* Prevent wrapping of the title */
+      height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
       .collection-checkbox {
