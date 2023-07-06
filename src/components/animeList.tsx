@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Link } from 'react-router-dom';
 import client from '../graphql/client';
 import ReactPaginate from 'react-paginate';
 import { css, cx } from '@emotion/css';
-import Header from "./header";
+import Header from './header';
 import loadingImage from '../images/loading.webp';
 import ReactModal from 'react-modal';
 
@@ -38,9 +37,6 @@ const AnimeList: React.FC = () => {
     const [selectedAnimeCollections, setSelectedAnimeCollections] = useState<Record<string, string[]>>({});
     const [collectionName, setCollectionName] = useState('');
     const [error, setError] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedAnimeToAdd, setSelectedAnimeToAdd] = useState('');
-    const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
     const [selectedAnimeId, setSelectedAnimeId] = useState('');
 
     const perPage = 10;
@@ -72,21 +68,6 @@ const AnimeList: React.FC = () => {
                 return [...prevSelectedAnime, animeId];
             }
         });
-    };
-
-    const openModal = (animeId: string) => {
-        setSelectedAnimeToAdd(animeId);
-        setIsModalOpen(true);
-    };
-
-    const openModalDetail = (animeId: string) => {
-        setSelectedAnimeId(animeId);
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setSelectedAnimeId('');
-        setIsModalOpen(false);
     };
 
     const handleSelectCollection = (animeId: string, collectionName: string) => {
@@ -138,6 +119,14 @@ const AnimeList: React.FC = () => {
         return specialCharacterRegex.test(name);
     };
 
+    const openModal = (animeId: string) => {
+        setSelectedAnimeId(animeId);
+    };
+
+    const closeModal = () => {
+        setSelectedAnimeId('');
+    };
+
     return (
         <div className={styles.animeListContainer}>
             <Header />
@@ -156,8 +145,8 @@ const AnimeList: React.FC = () => {
                 {data.Page.media.map((anime: any) => (
                     <li key={anime.id}>
                         <label>
-                            <img src={anime.coverImage.medium} alt={anime.title.romaji} onClick={() => openModalDetail(anime.id)} />
-                            <h3 onClick={() => openModalDetail(anime.id)}>{anime.title.romaji}</h3>
+                            <img src={anime.coverImage.medium} alt={anime.title.romaji} onClick={() => openModal(anime.id)} />
+                            <h3>{anime.title.romaji}</h3>
                             <div>
                                 <p>Episodes: {anime.episodes}</p>
                                 <p>Genres: {anime.genres.join(', ')}</p>
@@ -168,7 +157,7 @@ const AnimeList: React.FC = () => {
                                         checked={selectedAnime.includes(anime.id)}
                                         onChange={() => handleSelectAnime(anime.id)}
                                     />
-                                    <label onClick={() => openModal(anime.id)}>Add to Collection</label>
+                                    <label>Add to Collection</label>
                                 </div>
                             </div>
                         </label>
@@ -176,23 +165,30 @@ const AnimeList: React.FC = () => {
                 ))}
             </ul>
 
-            {/*<ReactModal isOpen={isModalOpen} onRequestClose={closeModal}>*/}
-            {/*    {selectedAnimeId && (*/}
-            {/*        <div>*/}
-            {/*            <h2>{selectedAnime.title.romaji}</h2>*/}
-            {/*            <p>{selectedAnime.description}</p>*/}
-            {/*            /!* Add more details as needed *!/*/}
-            {/*        </div>*/}
-            {/*    )}*/}
-            {/*    <button onClick={closeModal}>Close</button>*/}
-            {/*</ReactModal>*/}
-
             <ReactModal
-                isOpen={isModalOpen}
+                isOpen={Boolean(selectedAnimeId)}
                 onRequestClose={closeModal}
+                className={styles.modalContainer}
+                // overlayClassName={styles.modalOverlay}
             >
-                <h2>Add Anime to Collection</h2>
-                <p>Anime ID: {selectedAnimeToAdd}</p>
+                {selectedAnimeId && (
+                    <div className={styles.modalContent}>
+                        <div className={styles.imageContainer}>
+                            <img
+                                src={data.Page.media.find((anime: any) => anime.id === selectedAnimeId).coverImage.medium}
+                                alt={data.Page.media.find((anime: any) => anime.id === selectedAnimeId).title.romaji}
+                                className={styles.image}
+                            />
+                        </div>
+                        <div className={styles.textContainer}>
+                            <h2>{data.Page.media.find((anime: any) => anime.id === selectedAnimeId).title.romaji}</h2>
+                            <p>Episodes: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).episodes}</p>
+                            <p>Genres: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).genres.join(', ')}</p>
+                            <p>Rating: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).averageScore}/100</p>
+                            <p>{data.Page.media.find((anime: any) => anime.id === selectedAnimeId).description}</p>
+                        </div>
+                    </div>
+                )}
                 <button onClick={closeModal}>Close</button>
             </ReactModal>
 
@@ -438,6 +434,52 @@ const styles = {
       }
     }
   `,
+    modalContainer: css`
+      background-color: rgba(0,0,0,0.9);
+      width: 1200px; 
+      max-width: 100%;
+      height: 550px;
+      border-radius: 10px;
+      margin: 0 auto;
+      padding: 20px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    `,
+    modalOverlay: css`
+    background-color: rgba(0, 0, 0, 0.7);
+  `,
+    modalContent: css`
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    //grid-gap: 20px;
+    align-items: center;
+    padding: 20px;
+  `,
+    imageContainer: css`
+    display: flex;
+    justify-content: flex-start;
+  `,
+    image: css`
+    width: 80%;
+    height: 60%;
+    object-fit: cover;
+      border-radius: 10px;
+  `,
+    textContainer: css`
+    display: flex;
+    flex-direction: column;
+      color: #ffffff;
+  `,
 };
+
+const modalContainerStyles = css`
+  background-color: black;
+`;
+
+const modalOverlayStyles = css`
+  background-color: rgba(0, 0, 0, 0.7);
+`;
 
 export default AnimeList;
