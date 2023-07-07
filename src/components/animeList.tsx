@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import client from '../graphql/client';
 import ReactPaginate from 'react-paginate';
@@ -31,15 +31,29 @@ const ANIME_LIST_QUERY = gql`
   }
 `;
 
+const getInitials = (name: string): string => {
+    const words: string[] = name.split(' ');
+    const initials: string = words.map((word: string) => word.charAt(0)).join('');
+    return initials.toUpperCase();
+};
+
 const AnimeList: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedAnime, setSelectedAnime] = useState<string[]>([]);
     const [selectedAnimeCollections, setSelectedAnimeCollections] = useState<Record<string, string[]>>({});
+    const [collectionList, setCollectionList] = useState<string[]>([]);
     const [collectionName, setCollectionName] = useState('');
     const [error, setError] = useState('');
     const [selectedAnimeId, setSelectedAnimeId] = useState('');
 
     const perPage = 10;
+
+    useEffect(() => {
+        const storedCollectionList = localStorage.getItem('collectionList');
+        if (storedCollectionList) {
+            setCollectionList(JSON.parse(storedCollectionList));
+        }
+    }, []);
 
     const handlePageChange = (selectedPage: { selected: number }) => {
         setCurrentPage(selectedPage.selected);
@@ -59,6 +73,7 @@ const AnimeList: React.FC = () => {
     }
 
     const pageCount = Math.ceil(data.Page.pageInfo.total / perPage);
+
 
     const handleSelectAnime = (animeId: string) => {
         setSelectedAnime((prevSelectedAnime) => {
@@ -104,6 +119,13 @@ const AnimeList: React.FC = () => {
         console.log('Selected anime:', selectedAnime);
         console.log('Selected collections:', selectedAnimeCollections);
 
+        // Add the collection name to the collection list
+        const updatedCollectionList = [...collectionList, collectionName];
+        setCollectionList(updatedCollectionList);
+
+        // Save the updated collection list in local storage
+        localStorage.setItem('collectionList', JSON.stringify(updatedCollectionList));
+
         // Reset input fields and error message
         setCollectionName('');
         setError('');
@@ -140,6 +162,29 @@ const AnimeList: React.FC = () => {
                 <button onClick={handleCreateCollection}>Create Collection</button>
                 {error && <p>{error}</p>}
             </div>
+            {/* Display the collection list */}
+            <div className={styles.collectionList}>
+                {collectionList.length > 0 ? (
+                    <>
+                        <h2>Collection List</h2>
+                        <div className={styles.collectionCards}>
+                            {collectionList.map((collection) => (
+                                <div key={collection} className={styles.collectionCard}>
+                                    <div className={styles.initials}>{getInitials(collection)}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className={styles.collectionNames}>
+                            {collectionList.map((collection) => (
+                                <div key={collection} className={styles.collectionName}>{collection}</div>
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <p>No Collection List</p>
+                )}
+            </div>
+
             <h2>See What's Next!</h2>
             <ul className={styles.animeList}>
                 {data.Page.media.map((anime: any) => (
@@ -422,6 +467,24 @@ const styles = {
     align-items: center;
     height: 100vh;
   `,
+    collectionList: css`
+    margin-top: 20px;
+
+    h3 {
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-top: 5px;
+      color: white;
+    }
+  `,
     loadingIcon: css`
     width: 100px;
     height: 100px;
@@ -480,7 +543,6 @@ const styles = {
     flex-direction: column;
       color: #ffffff;
   `,
-
     closeButton: css`
     position: absolute;
     top: 10px;
@@ -490,12 +552,42 @@ const styles = {
     padding: 0;
     cursor: pointer;
   `,
-
     closeIcon: css`
     font-size: 24px;
     color: white;
       font-weight: bold;
   `,
+    collectionCards: css`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+      margin: 10px;
+  `,
+    collectionCard: css`
+    background-color: RGBA(98 ,39 ,19, 0.8);
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+  `,
+    collectionName: css`
+    margin: 0;
+    font-weight: bold;
+  `,
+    collectionInitials: css`
+    font-size: 24px;
+    margin-bottom: 8px;
+  `,
+    initials: css`
+    font-size: 30px;
+      font-weight: bolder;
+    `,
+    collectionNames: css({
+        marginTop: '10px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '20px',
+        textAlign: 'center',
+    }),
 };
 
 const modalContainerStyles = css`
