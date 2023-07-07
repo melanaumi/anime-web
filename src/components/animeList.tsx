@@ -169,10 +169,13 @@ const AnimeList: React.FC = () => {
                 isOpen={Boolean(selectedAnimeId)}
                 onRequestClose={closeModal}
                 className={styles.modalContainer}
-                // overlayClassName={styles.modalOverlay}
+                overlayClassName={styles.modalOverlay}
             >
                 {selectedAnimeId && (
                     <div className={styles.modalContent}>
+                        <button className={styles.closeButton} onClick={closeModal}>
+                            <span className={styles.closeIcon}>×</span>
+                        </button>
                         <div className={styles.imageContainer}>
                             <img
                                 src={data.Page.media.find((anime: any) => anime.id === selectedAnimeId).coverImage.medium}
@@ -181,7 +184,7 @@ const AnimeList: React.FC = () => {
                             />
                         </div>
                         <div className={styles.textContainer}>
-                            <h2>{data.Page.media.find((anime: any) => anime.id === selectedAnimeId).title.romaji}</h2>
+                            <h1>{data.Page.media.find((anime: any) => anime.id === selectedAnimeId).title.romaji}</h1>
                             <p>Episodes: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).episodes}</p>
                             <p>Genres: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).genres.join(', ')}</p>
                             <p>Rating: {data.Page.media.find((anime: any) => anime.id === selectedAnimeId).averageScore}/100</p>
@@ -189,7 +192,6 @@ const AnimeList: React.FC = () => {
                         </div>
                     </div>
                 )}
-                <button onClick={closeModal}>Close</button>
             </ReactModal>
 
             <ReactPaginate
@@ -435,10 +437,11 @@ const styles = {
     }
   `,
     modalContainer: css`
-      background-color: rgba(0,0,0,0.9);
+      background-color: rgba(18, 36, 44, 0.95);
+      //background-color: #000000;
       width: 1200px; 
       max-width: 100%;
-      height: 550px;
+      height: max-content;
       border-radius: 10px;
       margin: 0 auto;
       padding: 20px;
@@ -448,8 +451,13 @@ const styles = {
       transform: translate(-50%, -50%);
     `,
     modalOverlay: css`
-    background-color: rgba(0, 0, 0, 0.7);
-  `,
+      background-color: rgba(191, 191, 191, 0.5);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    `,
     modalContent: css`
     display: grid;
     grid-template-columns: 0.7fr 1.3fr;
@@ -471,6 +479,22 @@ const styles = {
     display: flex;
     flex-direction: column;
       color: #ffffff;
+  `,
+
+    closeButton: css`
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  `,
+
+    closeIcon: css`
+    font-size: 24px;
+    color: white;
+      font-weight: bold;
   `,
 };
 
