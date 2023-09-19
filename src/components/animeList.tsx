@@ -122,6 +122,7 @@ const AnimeList: React.FC = () => {
         // Add the collection name to the collection list
         const updatedCollectionList = [...collectionList, collectionName];
         setCollectionList(updatedCollectionList);
+        console.log();
 
         // Save the updated collection list in local storage
         localStorage.setItem('collectionList', JSON.stringify(updatedCollectionList));
